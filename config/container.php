@@ -50,7 +50,7 @@ return function (Configuration $config): Container {
     http($container);
     cache($container);
     debug($container);
-    events($container);
+    $events = include_once __DIR__ . '/container/events.php';
 
     return $container;
 };

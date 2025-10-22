@@ -13,6 +13,7 @@ use Webmaster\Http\Routing\Router;
 use Webmaster\Http\Dispatcher;
 use Relay\RelayBuilder;
 use DebugBar\DataCollector\TimeDataCollector;
+use function ob_start;
 
 class Web extends AbstractEntrypoint
 {
@@ -24,6 +25,7 @@ class Web extends AbstractEntrypoint
         private readonly Router $router,
         private readonly TimeDataCollector $timeline,
     ) {
+        ob_start();
     }
 
     public function handle(): int
@@ -69,6 +71,7 @@ class Web extends AbstractEntrypoint
 
     protected function emit(ResponseInterface $response): void
     {
+        ob_end_clean();
         // Send the response to the browser
         http_response_code($response->getStatusCode());
         foreach ($response->getHeaders() as $name => $values) {
