@@ -19,6 +19,7 @@ class Console extends AbstractEntrypoint
 
     public function handle(): int
     {
+        //dd($this->entityManager);
         ConsoleRunner::run(
             new SingleManagerProvider($this->entityManager),
             []

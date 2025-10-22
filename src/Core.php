@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Webmaster;
 
 use League\Config\Configuration;
+use Psr\Container\ContainerInterface;
 
 class Core implements CoreInterface
 {
     private Configuration $configuration;
 
-    private \Psr\Container\ContainerInterface $container;
+    private ContainerInterface $container;
 
     final public function __construct()
     {
@@ -23,7 +24,7 @@ class Core implements CoreInterface
 
     public function getWebmasterConfigDir(): string
     {
-        return ROOT . '/config/webmaster';
+        return WEBMASTER . '/config';
     }
 
     protected function loadConfiguration(): Configuration
@@ -56,10 +57,10 @@ class Core implements CoreInterface
 
     public function getWebmasterContainerDefinition(): string
     {
-        return ROOT . '/config/webmaster/container.php';
+        return $this->getWebmasterConfigDir() . '/container.php';
     }
 
-    protected function createContainer(): \Psr\Container\ContainerInterface
+    protected function createContainer(): ContainerInterface
     {
         $config = $this->getConfiguration();
 
@@ -78,7 +79,7 @@ class Core implements CoreInterface
         return $container;
     }
 
-    public function getContainer(): \Psr\Container\ContainerInterface
+    public function getContainer(): ContainerInterface
     {
         if (!isset($this->container)) {
             $this->container = $this->createContainer();

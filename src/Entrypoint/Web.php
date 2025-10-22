@@ -8,6 +8,7 @@ use Middlewares\Debugbar;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Webmaster\Http\Middleware\SessionHandler;
 use Webmaster\Http\Routing\Router;
 use Webmaster\Http\Dispatcher;
 use Relay\RelayBuilder;
@@ -34,6 +35,7 @@ class Web extends AbstractEntrypoint
 
         $queue = [
             $this->container->get(Debugbar::class),
+            $this->container->get(SessionHandler::class),
             $this->dispatcher,
         ];
         $relay = $this->relayBuilder->newInstance($queue);

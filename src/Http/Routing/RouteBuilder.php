@@ -49,7 +49,7 @@ class RouteBuilder
 
     public function build(): void
     {
-        $routesFile = dirname(__DIR__, 3) . '/config/routes.php';
+        $routesFile = ROOT . '/config/routes.php';
 
         if (file_exists($routesFile)) {
             $loader = require $routesFile;
