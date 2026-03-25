@@ -11,6 +11,15 @@ return function (): Configuration {
     $config->addSchema('http', httpSchema());
     $config->addSchema('db', dbSchema());
 
+    $config->merge([
+        'view' => [
+            'load_from' => [
+                WEBMASTER . '/views',
+            ],
+        ],
+    ]);
+
+
     return $config;
 };
 
@@ -26,6 +35,7 @@ function httpSchema(): Schema
     return Expect::structure([
         'base_uri' => Expect::string()->required(), 
         'redirects' => Expect::string('redirects.ini'),
+        'route_definitions' => Expect::string('routes.php'),
     ]);
 }
 

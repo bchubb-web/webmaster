@@ -9,8 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Webmaster\Http\Session;
-use Webmaster\Http\Session\CookieDriver;
+use Webmaster\Http\Domain\Session;
 
 class SessionHandler implements MiddlewareInterface
 {
@@ -29,6 +28,6 @@ class SessionHandler implements MiddlewareInterface
 
     protected function getSessionHeader(): string
     {
-        return Session::COOKIE_NAME . '=' . $this->session->__toString();
+        return $this->session->getCookieName() . '=' . $this->session->__toString();
     }
 }

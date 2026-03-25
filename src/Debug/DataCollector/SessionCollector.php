@@ -6,7 +6,7 @@ namespace Webmaster\Debug\DataCollector;
 
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
-use Webmaster\Http\Session;
+use Webmaster\Http\Domain\Session;
 
 class SessionCollector extends DataCollector implements Renderable
 {

@@ -5,51 +5,63 @@ declare(strict_types=1);
 namespace Webmaster\Entrypoint;
 
 use Middlewares\Debugbar;
+use Relay\RelayBuilder;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Webmaster\Debug\Contract\HasTimeCollector;
+use Webmaster\Debug\Trait\CanCollectTime;
 use Webmaster\Http\Middleware\SessionHandler;
+use Webmaster\Http\ResponseEmitter;
 use Webmaster\Http\Routing\Router;
 use Webmaster\Http\Dispatcher;
-use Relay\RelayBuilder;
-use DebugBar\DataCollector\TimeDataCollector;
 use function ob_start;
 
-class Web extends AbstractEntrypoint
+class Web extends AbstractEntrypoint implements HasTimeCollector
 {
+    use CanCollectTime;
+
     public function __construct(
         private ServerRequestInterface $request,
-        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly Router $router,
         private readonly RelayBuilder $relayBuilder,
         private readonly Dispatcher $dispatcher,
-        private readonly Router $router,
-        private readonly TimeDataCollector $timeline,
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly ResponseEmitter $emitter,
     ) {
         ob_start();
     }
 
     public function handle(): int
     {
-        $this->timeline->addMeasure('Framework boot', $_SERVER['REQUEST_TIME_FLOAT'], microtime(true));
-        $this->handleRedirects();
+        $this->addTimeMeasure('Framework boot', $_SERVER['REQUEST_TIME_FLOAT'], microtime(true));
 
-        $this->request = $this->router->match($this->request);
+        if (!is_null($redirectResult = $this->handleRedirects())) {
+            return $redirectResult;
+        }
 
-        $queue = [
-            $this->container->get(Debugbar::class),
-            $this->container->get(SessionHandler::class),
-            $this->dispatcher,
-        ];
-        $relay = $this->relayBuilder->newInstance($queue);
+        try {
+            $this->request = $this->router->match($this->request);
 
-        $response = $relay->handle($this->request);
+            $queue = [
+                $this->container->get(Debugbar::class),
+                $this->container->get(SessionHandler::class),
+                $this->dispatcher,
+            ];
+            $relay = $this->relayBuilder->newInstance($queue);
 
-        $this->emit($response);
+            $response = $relay->handle($this->request);
+        } catch (ResourceNotFoundException $e) {
+            $response = $this->responseFactory->createResponse(404);
+        }
+
+        ob_end_clean();
+        $this->emitter->emit($response);
 
         return 0;
     }
 
-    protected function handleRedirects(): void
+    protected function handleRedirects(): ?int
     {
         $redirectsFile = $this->getRedirectFilePath();
 
@@ -63,23 +75,13 @@ class Web extends AbstractEntrypoint
                     ->createResponse(301)
                     ->withHeader('Location', $target);
 
-                $this->emit($response);
-                exit(0);
+                ob_end_clean();
+                $this->emitter->emit($response);
+                return 0;
             }
         }
-    }
 
-    protected function emit(ResponseInterface $response): void
-    {
-        ob_end_clean();
-        // Send the response to the browser
-        http_response_code($response->getStatusCode());
-        foreach ($response->getHeaders() as $name => $values) {
-            foreach ($values as $value) {
-                header(sprintf('%s: %s', $name, $value), false);
-            }
-        }
-        echo $response->getBody();
+        return null;
     }
 
     protected function getRedirectFilePath(): string

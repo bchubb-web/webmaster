@@ -32,7 +32,8 @@
         "psr/http-server-handler": "^1.0",
         "middlewares/debugbar": "^2.2",
         "symfony/event-dispatcher": "^7.3",
-        "league/flysystem": "^3.30"
+        "league/flysystem": "^3.30",
+        "opis/closure": "^4.3"
     },
     "require-dev": {
         "php-debugbar/php-debugbar": "^2.2",

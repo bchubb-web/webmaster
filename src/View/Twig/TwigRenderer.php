@@ -1,22 +1,26 @@
 <?php
 
-namespace Webmaster\View;
+declare(strict_types=1);
+
+namespace Webmaster\View\Twig;
 
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Twig\Environment;
-use DebugBar\DataCollector\TimeDataCollector;
 use Webmaster\Debug\Contract\HasTimeCollector;
+use Webmaster\Debug\Trait\CanCollectTime;
+use Webmaster\View\Contract\ViewRenderer;
 
-class SimpleRenderer implements Contract\ViewRenderer, HasTimeCollector
+class TwigRenderer implements ViewRenderer, HasTimeCollector
 {
+    use CanCollectTime;
+
     public function __construct(
         private readonly Environment $twig,
         private readonly StreamFactoryInterface $streamFactory,
         private readonly ResponseFactoryInterface $responseFactory,
-        private readonly TimeDataCollector $timeline,
     ) {
     }
     public function render(string $template, array $data = []): string

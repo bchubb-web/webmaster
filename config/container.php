@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Application\EntityRegistry;
 use League\Container\ContainerAwareInterface;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
+use Webmaster\Debug\Contract\HasTimeCollector;
 use Webmaster\Debug\DataCollector\SessionCollector;
 use Webmaster\Http\Routing\Cache\RedisCache;
-use Webmaster\Http\Session;
 use \DebugBar\DataCollector as Collector;
 use League\Config\Configuration;
 use League\Container\Container;
@@ -28,7 +27,7 @@ use Twig\Loader\LoaderInterface;
 use Webmaster\Debug\DebugBar;
 
 return function (Configuration $config): Container {
-    $container = new Container(defaultToOverwrite: true);
+    $container = new Container();
 
     $container->delegate(new ReflectionContainer(cacheResolutions: true));
 
@@ -50,7 +49,12 @@ return function (Configuration $config): Container {
     http($container);
     cache($container);
     debug($container);
+    $view = include_once __DIR__ . '/container/view.php';
+    $view($container);
+    $http = include_once __DIR__ . '/container/http.php';
+    $http($container);
     $events = include_once __DIR__ . '/container/events.php';
+    $events($container);
 
     return $container;
 };
@@ -61,11 +65,11 @@ function twig(Container $container): Container
         ->addShared(
             Environment::class,
         )
-        ->addArgument(LoaderInterface::class)
-        /*->addArgument([
-            'debug' => true,
+        ->addArguments([LoaderInterface::class, [
             'strict_variables' => true,
-        ])*/
+            'cache' => ROOT . '/tmp/cache',
+            'debug' => true,
+        ]])
         ->addMethodCall('addRuntimeLoader', [
             ContainerRuntimeLoader::class,
         ])
@@ -86,12 +90,6 @@ function twig(Container $container): Container
  */
 function http(Container $container): Container
 {
-    $container
-        ->addShared(
-            Session::class,
-        )
-        ->addArgument(ServerRequestInterface::class)
-    ;
     $container
         ->add(
             ServerRequestInterface::class,
@@ -249,22 +247,11 @@ function debug(Container $container): Container
         ->addArgument(Psr\Http\Message\StreamFactoryInterface::class)
         ->addMethodCall('inline')
     ;
-    return $container;
-}
-function events(Container $container): Container
-{
-    $container
-        ->addShared(
-            Symfony\Component\EventDispatcher\EventDispatcher::class,
-        )
-    ;
+
 
     $container
-        ->addShared(
-            Psr\EventDispatcher\EventDispatcherInterface::class,
-            fn ($dispatcher) => $dispatcher,
-        )
-        ->addArgument(Symfony\Component\EventDispatcher\EventDispatcher::class)
+        ->inflector(HasTimeCollector::class)
+        ->invokeMethod('setTimeCollector', [Collector\TimeDataCollector::class])
     ;
 
     return $container;

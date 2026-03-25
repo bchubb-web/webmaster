@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
 use Symfony\Component\Console\Application;
+use Webmaster\Http\Routing\Command\ListRoutes;
 
 class Console extends AbstractEntrypoint
 {
@@ -26,8 +27,10 @@ class Console extends AbstractEntrypoint
         ConsoleRunner::addCommands($this->app, new SingleManagerProvider($this->entityManager));
 
         $commands = [
-            // Register your console commands here
+            ListRoutes::class,
         ];
+
+        $commands = array_map(fn ($command) => $this->container->get($command), $commands);
 
         $this->app->addCommands($commands);
 

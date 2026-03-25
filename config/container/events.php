@@ -9,6 +9,9 @@ return function (Container $container): void {
         ->addShared(
             Symfony\Component\EventDispatcher\EventDispatcher::class,
         )
+        ->addMethodCall('addSubscriber', [
+            Webmaster\Debug\DebugEventSubscriber::class,
+        ])
     ;
 
     $container
