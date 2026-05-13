@@ -45,7 +45,6 @@ return function (Configuration $config): Container {
     ;
 
     // Register core services here
-    twig($container);
     http($container);
     cache($container);
     debug($container);

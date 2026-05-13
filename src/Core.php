@@ -55,9 +55,21 @@ class Core implements CoreInterface
         ];
     }
 
+    public function getProviders(): array
+    {
+        return [];
+    }
+
     public function getWebmasterContainerDefinition(): string
     {
         return $this->getWebmasterConfigDir() . '/container.php';
+    }
+
+    public function getWebmasterProviders(): array
+    {
+        return [
+            $this->getWebmasterConfigDir() . '/container/twig.php',
+        ];
     }
 
     protected function createContainer(): ContainerInterface
@@ -74,6 +86,25 @@ class Core implements CoreInterface
             }
             $definitions = include $file;
             $container = $definitions($container);
+            unset($definitions, $file);
+        }
+
+        foreach ($this->getWebmasterProviders() as $file) {
+            if (!is_file($file)) {
+                throw new \RuntimeException("Container definition file not found: $file");
+            }
+            $provider = include $file;
+            $container->addServiceProvider($provider);
+            unset($provider, $file);
+        }
+
+        foreach ($this->getProviders() as $file) {
+            if (!is_file($file)) {
+                throw new \RuntimeException("Container definition file not found: $file");
+            }
+            $provider = include $file;
+            $container->addServiceProvider($provider);
+            unset($provider, $file);
         }
 
         return $container;

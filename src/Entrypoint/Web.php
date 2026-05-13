@@ -44,7 +44,7 @@ class Web extends AbstractEntrypoint implements HasTimeCollector
             $this->request = $this->router->match($this->request);
 
             $queue = [
-                $this->container->get(Debugbar::class),
+                //$this->container->get(Debugbar::class),
                 $this->container->get(SessionHandler::class),
                 $this->dispatcher,
             ];

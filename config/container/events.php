@@ -21,4 +21,12 @@ return function (Container $container): void {
         )
         ->addArgument(Symfony\Component\EventDispatcher\EventDispatcher::class)
     ;
+
+    $container
+        ->addShared(
+            Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class,
+            fn ($dispatcher) => $dispatcher,
+        )
+        ->addArgument(Symfony\Component\EventDispatcher\EventDispatcher::class)
+    ;
 };
