@@ -38,8 +38,5 @@
     "require-dev": {
         "php-debugbar/php-debugbar": "^2.2",
         "phpunit/phpunit": "^12.4"
-    },
-    "scripts": {
-        "post-package-update": "bash vendor/bchubb-web/webmaster/bin/publish.sh"
     }
 }
