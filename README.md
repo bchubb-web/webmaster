@@ -1,7 +1,7 @@
 # Webmaster!
 
 ## Introduction
-Webmaster is a lean website development framework designed to ease the process of building and maintaining websites. It provides an anything-goes approach, allowing developers to create custom solutions without being constrained by rigid structures.
+Webmaster is a lean website development framework designed to ease the process of building and maintaining websites. It provides an anything-goes approach, allowing developers to create custom solutions without being constrained by rigid structures while still providing simple means to get up and running quickly.
 
 ## Getting Started
 To get started with Webmaster, ensure that webmaster is installed in your project with composer:
