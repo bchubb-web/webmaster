@@ -68,7 +68,7 @@ class Core implements CoreInterface
     public function getWebmasterProviders(): array
     {
         return [
-            $this->getWebmasterConfigDir() . '/container/twig.php',
+            'webmaster.twig' => $this->getWebmasterConfigDir() . '/container/twig.php',
         ];
     }
 
@@ -95,7 +95,6 @@ class Core implements CoreInterface
             }
             $provider = include $file;
             $container->addServiceProvider($provider);
-            unset($provider, $file);
         }
 
         foreach ($this->getProviders() as $file) {
@@ -104,7 +103,6 @@ class Core implements CoreInterface
             }
             $provider = include $file;
             $container->addServiceProvider($provider);
-            unset($provider, $file);
         }
 
         return $container;

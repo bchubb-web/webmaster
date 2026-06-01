@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use League\Container\ContainerAwareInterface;
+use League\Container\ServiceProvider\ServiceProviderAggregate;
+use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Webmaster\Debug\Contract\HasTimeCollector;
 use Webmaster\Debug\DataCollector\SessionCollector;
@@ -27,7 +29,8 @@ use Twig\Loader\LoaderInterface;
 use Webmaster\Debug\DebugBar;
 
 return function (Configuration $config): Container {
-    $container = new Container();
+    $providerAggregate = new ServiceProviderAggregate();
+    $container = new Container(providers: $providerAggregate);
 
     $container->delegate(new ReflectionContainer(cacheResolutions: true));
 
@@ -36,6 +39,8 @@ return function (Configuration $config): Container {
         ->addShared(ContainerInterface::class, fn ($c) => $c)
         ->addArgument(Container::class)
     ;
+
+    $container->addShared(ServiceProviderAggregateInterface::class, $providerAggregate);
 
     $container->addShared(Configuration::class, $config);
 
