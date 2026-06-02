@@ -55,7 +55,6 @@ class Dispatcher implements RequestHandlerInterface
             $response = $instance->handle($request);
         } else {
             throw new \RuntimeException('Cannot dispatch request, target is not callable or a RequestHandlerInterface');
-
         }
 
         $this->timeline->stopMeasure('request-handler');

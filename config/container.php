@@ -35,10 +35,7 @@ return function (Configuration $config): Container {
     $container->delegate(new ReflectionContainer(cacheResolutions: true));
 
     $container->addShared(Container::class, $container);
-    $container
-        ->addShared(ContainerInterface::class, fn ($c) => $c)
-        ->addArgument(Container::class)
-    ;
+    $container->addShared(ContainerInterface::class, $container);
 
     $container->addShared(ServiceProviderAggregateInterface::class, $providerAggregate);
 
@@ -238,9 +235,6 @@ function debug(Container $container): Container
             ->addMethodCall('addCollector', [$collector])
         ;
     }
-
-
-
 
     $container
         ->addShared(

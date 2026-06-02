@@ -23,7 +23,6 @@ abstract class Provider extends AbstractServiceProvider
 
     public function register(): void
     {
-        dump('registering' . $this->getIdentifier());
         /** @var Container $container */
         $container = $this->getContainer();
         $providers = $container->get(ServiceProviderAggregateInterface::class);
@@ -32,7 +31,6 @@ abstract class Provider extends AbstractServiceProvider
 
         foreach ($providers->getIterator() as $provider) {
             if (count(array_intersect($provider->requires(), $this->providedServices())) > 0) {
-                dump('registering provider ' . $provider->getIdentifier() . ' because it requires something we provide');
                 $provider->definitions($this->getContainer());
             }
         }
