@@ -7,11 +7,16 @@ namespace Webmaster;
 interface CoreInterface
 {
     public function __construct();
-    /* config files */
 
-    public function getContainerDefinitionFiles(): array;
+    /* db */
 
-    public function getWebmasterContainerDefinition(): string;
+    public function getEntities(): array;
+
+    /* container */
+
+    public function getContainerDefinition(): string;
+
+    public function getProviders(): array;
 
     /* config files */
 

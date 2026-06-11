@@ -17,6 +17,11 @@ class Core implements CoreInterface
     {
     }
 
+    public function getEntities(): array
+    {
+        return [];
+    }
+
     public function getConfigDir(): string
     {
         return ROOT . '/config';
@@ -48,19 +53,12 @@ class Core implements CoreInterface
     }
 
 
-    public function getContainerDefinitionFiles(): array
-    {
-        return [
-            ROOT . '/config/container.php',
-        ];
-    }
-
     public function getProviders(): array
     {
         return [];
     }
 
-    public function getWebmasterContainerDefinition(): string
+    public function getContainerDefinition(): string
     {
         return $this->getWebmasterConfigDir() . '/container.php';
     }
@@ -76,18 +74,9 @@ class Core implements CoreInterface
     {
         $config = $this->getConfiguration();
 
-        $init = include $this->getWebmasterContainerDefinition();
+        $init = include $this->getContainerDefinition();
 
         $container = $init($config);
-
-        foreach ($this->getContainerDefinitionFiles() as $file) {
-            if (!is_file($file)) {
-                throw new \RuntimeException("Container definition file not found: $file");
-            }
-            $definitions = include $file;
-            $container = $definitions($container);
-            unset($definitions, $file);
-        }
 
         foreach ($this->getWebmasterProviders() as $file) {
             if (!is_file($file)) {
@@ -103,6 +92,10 @@ class Core implements CoreInterface
             }
             $provider = include $file;
             $container->addServiceProvider($provider);
+        }
+
+        foreach ($this->getEntities() as $entity) {
+            $container->add($entity)->addTag('webmaster.db.entity');
         }
 
         return $container;

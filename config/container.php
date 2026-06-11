@@ -205,20 +205,9 @@ function debug(Container $container): Container
         )
     ;
 
-    $container
-        ->addShared(
-            Collector\PDO\PDOCollector::class,
-            function (\Doctrine\DBAL\Connection $connection, Collector\TimeDataCollector $time) {
-                return new Collector\PDO\PDOCollector($connection->getNativeConnection(), $time);
-            }
-        )
-        ->addArgument(\Doctrine\DBAL\Connection::class)
-        ->addArgument(Collector\TimeDataCollector::class)
-    ;
-
     foreach ([
         Collector\MessagesCollector::class,
-        Collector\PDO\PDOCollector::class,
+        //Collector\PDO\PDOCollector::class,
         Collector\TimeDataCollector::class,
         Collector\RequestDataCollector::class,
         SessionCollector::class,

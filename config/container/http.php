@@ -15,3 +15,23 @@ return function (Container $container): void {
         ->addArgument(Psr\Http\Message\ServerRequestInterface::class)
     ;
 };
+
+return new class extends Provider
+{
+    protected $identifier = 'webmaster.http';
+
+    public function requires(): array
+    {
+        return [
+        ];
+    }
+
+    public function providedServices(): array
+    {
+        return [];
+    }
+
+    public function definitions(Container $container): void
+    {
+    }
+};
