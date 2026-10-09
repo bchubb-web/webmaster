@@ -54,7 +54,8 @@
         "doctrine/orm": "^3.5",
 
         "league/flysystem": "^3.30",
-        "opis/closure": "^4.3"
+        "opis/closure": "^4.3",
+        "easycorp/easyadmin-bundle": "^5.0"
     },
     "require-dev": {
         "php-debugbar/php-debugbar": "^2.2",
@@ -65,5 +66,10 @@
             "type": "vcs",
             "url": "https://github.com/bchubb-web/webmaster-doctrine.git"
         }
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
+    }
 }
