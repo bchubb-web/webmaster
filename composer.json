@@ -38,7 +38,7 @@
         "symfony/cache": "^8.0",
 
         "symfony/twig-bundle": "^8.0",
-        "symfony/twig-bridge": "^8.8",
+        "symfony/twig-bridge": "^8.0",
 
         "symfony/web-profiler-bundle": "^8.0",
 
