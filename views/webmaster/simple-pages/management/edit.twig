@@ -1,0 +1,13 @@
+{% extends 'webmaster/simple-pages/template/simple-page.twig' %}
+
+{% block actions %}
+    <button 
+        type="submit" 
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        form="edit-page-form"
+    >Save</button>
+{% endblock actions %}
+
+{% block main %}
+    {% include 'webmaster/simple-pages/component/editor-frame.twig' %}
+{% endblock main %}

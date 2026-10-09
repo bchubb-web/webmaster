@@ -13,6 +13,9 @@ class Core implements CoreInterface
 
     private ContainerInterface $container;
 
+    private array $webmasterBuiltinEntities = [
+    ];
+
     final public function __construct()
     {
     }

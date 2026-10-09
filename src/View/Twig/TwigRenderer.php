@@ -4,35 +4,36 @@ declare(strict_types=1);
 
 namespace Webmaster\View\Twig;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Twig\Environment;
-use Webmaster\Debug\Contract\HasTimeCollector;
-use Webmaster\Debug\Trait\CanCollectTime;
 use Webmaster\View\Contract\ViewRenderer;
+use Webmaster\View\Event;
 
-class TwigRenderer implements ViewRenderer, HasTimeCollector
+class TwigRenderer implements ViewRenderer
 {
-    use CanCollectTime;
-
     public function __construct(
         private readonly Environment $twig,
         private readonly StreamFactoryInterface $streamFactory,
         private readonly ResponseFactoryInterface $responseFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
+
     public function render(string $template, array $data = []): string
     {
-        $this->getTimeCollector()->startMeasure("rendering-$template", "Rendering $template");
+        $this->eventDispatcher->dispatch(new Event\RenderStart($template));
+
         if (!$this->twig->getLoader()->exists($template)) {
             throw new \RuntimeException("Template '$template' not found.");
         }
 
         $output = $this->twig->render($template, $data);
 
-        $this->getTimeCollector()->stopMeasure("rendering-$template");
+        $this->eventDispatcher->dispatch(new Event\RenderEnd($template));
 
         return $output;
     }

@@ -1,0 +1,22 @@
+{% extends 'webmaster/simple-pages/template/manage.twig' %}
+
+{% block actions %}
+    <a href="/manage/edit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create New Page</a>
+{% endblock actions %}
+
+{% block main %}
+    <table class="table-auto border-collapse border border-gray-300 w-full">
+        <tr>
+            <th class="border border-gray-300 px-4 py-2">Name</th>
+            <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+        {% for page in pages %}
+            <tr>
+                <td class="border border-gray-300 px-4 py-2">{{ page.title }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <a href="/manage/{{ page.title }}" class="text-blue-500 hover:underline">Edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock main %}

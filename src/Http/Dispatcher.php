@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Webmaster\Http;
 
-use DebugBar\DataCollector\TimeDataCollector;
 use Nyholm\Psr7\Stream;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -12,6 +11,10 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Webmaster\Http\Event\DispatchPost;
+use Webmaster\Http\Event\DispatchPre;
+use Webmaster\Http\Event\HandleRequestPost;
+use Webmaster\Http\Event\HandleRequestPre;
 use function class_implements;
 use function is_object;
 
@@ -22,7 +25,6 @@ class Dispatcher implements RequestHandlerInterface
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly ResponseFactoryInterface $responseFactory,
-        private readonly TimeDataCollector $timeline,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
@@ -31,7 +33,7 @@ class Dispatcher implements RequestHandlerInterface
     {
         $target = $request->getAttribute('_target');
 
-        $this->timeline->startMeasure('dispatch', 'Dispatching');
+        $this->eventDispatcher->dispatch(new DispatchPre());
 
         if (is_array($target)) {
             $callable = $this->container->get($target[0]);
@@ -41,7 +43,7 @@ class Dispatcher implements RequestHandlerInterface
             $target = $this->container->get($target);
         }
 
-        $this->timeline->startMeasure('request-handler', 'Handle Request');
+        $this->eventDispatcher->dispatch(new HandleRequestPre($target, $request));
         // hanlde callable, then requesthandler interface
         if (is_callable($target)) {
             $args = $this->resolveArgumentsForTarget($target, $request);
@@ -57,9 +59,8 @@ class Dispatcher implements RequestHandlerInterface
             throw new \RuntimeException('Cannot dispatch request, target is not callable or a RequestHandlerInterface');
         }
 
-        $this->timeline->stopMeasure('request-handler');
-
-        $this->timeline->stopMeasure('dispatch');
+        $this->eventDispatcher->dispatch(new HandleRequestPost());
+        $this->eventDispatcher->dispatch(new DispatchPost());
 
         if (is_string($response)) {
             $response = $this

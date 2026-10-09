@@ -1,0 +1,11 @@
+<section 
+    data-block="{{ block.id }}" 
+    class="group relative block hover:outline hover:outline-red-500"
+>
+    <button class="group:hover:block none absolute top-2 right-2 bg-yellow-400 text-white p-1">
+    edit
+    </button>
+
+    {% block content %}
+    {% endblock content %}
+</section>

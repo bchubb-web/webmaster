@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html class="">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Title{% endblock %}</title>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script type="module"> import tailwindcssforms from 'https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.5.11/+esm' </script>
+
+      <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" 
+      integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+      crossorigin="anonymous"></script>
+        {% block head %}
+        {% endblock head %}
+        <style>
+        input {
+            border: 1px solid #ccc;
+        }
+        </style>
+    </head>
+    <body class="min-h-screen bg-gray-50 flex">
+        <aside class="bg-zinc-800 text-white w-64 min-h-screen p-4">
+            <h2 class="text-xl font-bold mb-4">Webmaster Menu</h2>
+            <ul>
+                <li class="mb-2"><a href="/manage" class="hover:underline">Pages</a></li>
+            </ul>
+        </aside>
+        <main class="bg-white p-8 flex-1">
+            <h1>Webmaster.</h1>
+
+            <header class="flex justify-between items-center mb-4">
+                <div> </div>
+                <nav class="flex gap-4">
+                    {% block actions %}
+                    {% endblock actions %}
+                </nav>
+            </header>
+
+            {% block main %}
+            {% endblock main %}
+        </main>
+    </body>
+</html>
+

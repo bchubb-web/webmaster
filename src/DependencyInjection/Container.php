@@ -29,7 +29,7 @@ class Container implements Contract\ContainerContract
         $this->validateService($service);
     }
 
-    public function factory(string $id, callable $factory): void
+    public function factory(string $id, callable|string|null $result = null): void
     {
         $this->validateId($id);
     }

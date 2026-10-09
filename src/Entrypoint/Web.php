@@ -9,18 +9,14 @@ use Relay\RelayBuilder;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Webmaster\Debug\Contract\HasTimeCollector;
-use Webmaster\Debug\Trait\CanCollectTime;
 use Webmaster\Http\Middleware\SessionHandler;
 use Webmaster\Http\ResponseEmitter;
 use Webmaster\Http\Routing\Router;
 use Webmaster\Http\Dispatcher;
 use function ob_start;
 
-class Web extends AbstractEntrypoint implements HasTimeCollector
+class Web extends AbstractEntrypoint
 {
-    use CanCollectTime;
-
     public function __construct(
         private ServerRequestInterface $request,
         private readonly Router $router,
@@ -34,8 +30,6 @@ class Web extends AbstractEntrypoint implements HasTimeCollector
 
     public function handle(): int
     {
-        $this->addTimeMeasure('Framework boot', $_SERVER['REQUEST_TIME_FLOAT'], microtime(true));
-
         if (!is_null($redirectResult = $this->handleRedirects())) {
             return $redirectResult;
         }
@@ -52,6 +46,7 @@ class Web extends AbstractEntrypoint implements HasTimeCollector
 
             $response = $relay->handle($this->request);
         } catch (ResourceNotFoundException $e) {
+            dd($e);
             $response = $this->responseFactory->createResponse(404);
         }
 

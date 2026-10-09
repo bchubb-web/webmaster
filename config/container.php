@@ -223,7 +223,13 @@ function debug(Container $container): Container
             ->extend(DebugBar::class)
             ->addMethodCall('addCollector', [$collector])
         ;
+
     }
+
+    $container
+        ->extend(DebugBar::class)
+        ->addMethodCall('addCollector', [Collector\PDO\PDOCollector::class])
+    ;
 
     $container
         ->addShared(
@@ -233,12 +239,6 @@ function debug(Container $container): Container
         ->addArgument(Psr\Http\Message\ResponseFactoryInterface::class)
         ->addArgument(Psr\Http\Message\StreamFactoryInterface::class)
         ->addMethodCall('inline')
-    ;
-
-
-    $container
-        ->inflector(HasTimeCollector::class)
-        ->invokeMethod('setTimeCollector', [Collector\TimeDataCollector::class])
     ;
 
     return $container;

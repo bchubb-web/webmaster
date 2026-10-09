@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Webmaster\Http\Routing;
 
-use DebugBar\DataCollector\MessagesCollector;
-use DebugBar\DataCollector\TimeDataCollector;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
+use Webmaster\Http\Event\RoutesBuilt;
 use Webmaster\Http\Routing\Cache\RedisCache;
 use Webmaster\Http\Method;
 
@@ -18,8 +18,7 @@ class RouteBuilder
     public function __construct(
         protected readonly RedisCache $cache,
         protected readonly RouteCollection $rawRoutes,
-        protected readonly TimeDataCollector $timeline,
-        protected readonly MessagesCollector $messages,
+        protected readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -32,24 +31,23 @@ class RouteBuilder
         string|array $target,
         array $methods = [Method::GET, Method::POST],
         ?string $name = null,
+        array $defaults = [],
         array $requirements = [],
 
     ): Definition {
 
         $uri = rtrim($uri, '/');
 
+        $defaults = array_merge($defaults, ['_target' => $target]);
         $route = new Definition(
-            $uri,
-            ['_target' => $target],
-            $requirements,
-            [],
-            '',
-            [],
-            $methods,
+            path: $uri,
+            defaults: $defaults,
+            requirements: $requirements,
+            methods: $methods,
         );
 
         $this->rawRoutes->add(
-            $name ?? spl_object_id($route),
+            $name ?? (string) spl_object_id($route),
             $route
         );
 
@@ -73,21 +71,28 @@ class RouteBuilder
 
     }
 
+    public function getRawRoutes(): RouteCollection
+    {
+        return $this->rawRoutes;
+    }
+
     public function getRoutes(): array
     {
+        $cached = null;
         $start = microtime(true);
         if (0 === count($this->routes)) {
             if (null === $cached = $this->cache->get()) {
                 $this->build();
-                $this->timeline->addMeasure('Build routes', $start, microtime(true));
             } else {
                 $this->routes = $cached;
-                $this->timeline->addMeasure('Retrieve cached routes', $start, microtime(true));
-
             }
         }
 
-        $this->messages->addMessage($this->routes, 'Routes');
+        $this->eventDispatcher->dispatch(new RoutesBuilt(
+            routes: $this->routes,
+            startTime: $start,
+            cached: $cached !== null,
+        ));
 
         return $this->routes;
     }

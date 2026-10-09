@@ -12,6 +12,9 @@ return function (Container $container): void {
         ->addMethodCall('addSubscriber', [
             Webmaster\Debug\DebugEventSubscriber::class,
         ])
+        ->addMethodCall('addSubscriber', [
+            Webmaster\Debug\Event\ViewEventSubscriber::class,
+        ])
     ;
 
     $container

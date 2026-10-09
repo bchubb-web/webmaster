@@ -1,0 +1,16 @@
+<section 
+    id="simple-page" 
+    class="max-w-5xl mx-auto mb-4 flex flex-col"
+>
+    <div
+        class="border-dotted border-4 border-stone-600 p-4 text-stone-600 flex justify-center items-center"
+        hx-get="/_/manage/block/{{ "App\\Blocks\\Hero"|url_encode }}"
+        hx-trigger="click"
+        hx-target="#simple-page"
+        hx-swap="beforeend"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+    </div>
+</section>

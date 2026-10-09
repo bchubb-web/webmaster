@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 use League\Container\Container;
 use Psr\Container\ContainerInterface;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
-use Twig\RuntimeLoader\ContainerRuntimeLoader;
-use Twig\Loader\LoaderInterface;
 use League\Config\Configuration;
-use Symfony\UX\TwigComponent\Twig\ComponentExtension;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\UX\TwigComponent\ComponentTemplateFinder;
 use Symfony\UX\TwigComponent\ComponentTemplateFinderInterface;
+use Symfony\UX\TwigComponent\Twig\ComponentExtension;
 use Symfony\UX\TwigComponent\Twig\ComponentLexer;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Bridge\Twig\Extension\FormExtension;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use Twig\Loader\LoaderInterface;
+use Twig\RuntimeLoader\ContainerRuntimeLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
 use Webmaster\DependencyInjection\Provider;
 
 
@@ -59,6 +64,23 @@ return new class extends Provider
         ;
 
         $container
+            ->add(TwigRendererEngine::class)
+            ->addArgument(['tailwind_2_layout.html.twig'])
+            ->addArgument(Environment::class)
+        ;
+
+        $container
+            ->add(FactoryRuntimeLoader::class, function (ContainerInterface $container) {
+                return new FactoryRuntimeLoader([
+                    FormRenderer::class => function () use ($container) {
+                        return new FormRenderer($container->get(TwigRendererEngine::class));
+                    },
+                ]);
+            })
+            ->addArgument(ContainerInterface::class)
+        ;
+
+        $container
             ->addShared(
                 Environment::class,
             )
@@ -67,8 +89,11 @@ return new class extends Provider
                 'cache' => ROOT . '/tmp/cache',
                 'debug' => true,
             ]])
+            ->addMethodCall('addRuntimeLoader', [FactoryRuntimeLoader::class])
             ->addMethodCall('addRuntimeLoader', [ContainerRuntimeLoader::class])
             ->addMethodCall('addExtension', [ComponentExtension::class])
+            ->addMethodCall('addExtension', [FormExtension::class])
+            ->addMethodCall('addExtension', [TranslationExtension::class])
         ;
 
         $container
@@ -76,6 +101,7 @@ return new class extends Provider
                 return new FilesystemLoader($config->get('view.load_from', []));
             })
             ->addArgument(Configuration::class)
+            ->addMethodCall('addPath', [ROOT . '/vendor/symfony/twig-bridge/Resources/views/Form', 'form_themes'])
         ;
 
         $container
